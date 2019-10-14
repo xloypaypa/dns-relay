@@ -3,6 +3,7 @@ package online.xloypaypa.dns.relay.network.client;
 import com.google.gson.JsonArray;
 import coredns.dns.Dns;
 import online.xloypaypa.dns.relay.config.ClientConfig;
+import online.xloypaypa.dns.relay.network.merger.MultiRespondsMerger;
 
 import javax.net.ssl.SSLException;
 import java.util.Arrays;
@@ -48,7 +49,4 @@ public class MultiDnsClient implements DnsClient {
         }).collect(Collectors.toList()));
     }
 
-    public interface MultiRespondsMerger {
-        Dns.DnsPacket mergeResponds(Dns.DnsPacket request, JsonArray clients, List<Dns.DnsPacket> responds);
-    }
 }

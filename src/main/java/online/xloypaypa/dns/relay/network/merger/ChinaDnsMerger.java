@@ -1,4 +1,4 @@
-package online.xloypaypa.dns.relay.network.client.merger;
+package online.xloypaypa.dns.relay.network.merger;
 
 import com.google.gson.JsonArray;
 import com.google.protobuf.ByteString;

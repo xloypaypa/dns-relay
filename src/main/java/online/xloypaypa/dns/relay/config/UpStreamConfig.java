@@ -5,8 +5,9 @@ import com.google.gson.JsonObject;
 import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
 import online.xloypaypa.dns.relay.network.client.DirectDnsClient;
 import online.xloypaypa.dns.relay.network.client.DnsClientBuilder;
-import online.xloypaypa.dns.relay.network.client.merger.ChinaDnsMerger;
-import online.xloypaypa.dns.relay.network.client.merger.DefaultMerger;
+import online.xloypaypa.dns.relay.network.merger.ChinaDnsMerger;
+import online.xloypaypa.dns.relay.network.merger.DefaultMerger;
+import online.xloypaypa.dns.relay.network.merger.MultiRespondsMerger;
 
 import javax.net.ssl.SSLException;
 import java.util.concurrent.ExecutorService;
@@ -42,7 +43,7 @@ public class UpStreamConfig {
         }
     }
 
-    private MultiDnsClient.MultiRespondsMerger merger(String type) {
+    private MultiRespondsMerger merger(String type) {
         switch (type) {
             case "default":
                 return new DefaultMerger();
