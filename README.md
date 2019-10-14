@@ -23,5 +23,6 @@
 
 # TODO
 >* 重构代码，拆分把merger独立出来，毕竟merge其实和client去拿到多个dns server的结果这件事情其实没什么关系。
+>* 重构dns请求解析代码……简直就是一坨屎……
 >* 引入clojure进行配置。主要是因为目前判断ip的国家是直接用的淘宝的ip库。显然，用json配置这个是不可能的，但又不想写死，所以妥妥的clojure。
 >* 引入ip校验。在merger里加一个配置叫做"verify":true，可结合chinaOnly使用。两个做的事情其实类似，只是一个是验证ip的归属地，一个是验证ip的证书是不是和查询的domain一致（这里默认全世界所有网站都是https的，如果连https都没有你还指望他能又cdn？能指望他对不同地区又多个ip？）。
