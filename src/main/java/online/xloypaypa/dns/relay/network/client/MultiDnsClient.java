@@ -3,7 +3,6 @@ package online.xloypaypa.dns.relay.network.client;
 import com.google.gson.JsonArray;
 import coredns.dns.Dns;
 import online.xloypaypa.dns.relay.config.ClientConfig;
-import online.xloypaypa.dns.relay.config.Config;
 import online.xloypaypa.dns.relay.network.client.util.DirectDnsClient;
 
 import javax.net.ssl.SSLException;
@@ -24,7 +23,7 @@ public class MultiDnsClient {
         this.executor = executor;
     }
 
-    public Dns.DnsPacket query(Dns.DnsPacket request) throws InterruptedException, SSLException {
+    public List<Dns.DnsPacket> query(Dns.DnsPacket request) throws InterruptedException, SSLException {
         DirectDnsClient[] directDnsClients = generateDirectDnsClients();
 
         List<Future<Dns.DnsPacket>> futures = Arrays.stream(directDnsClients)
@@ -34,13 +33,13 @@ public class MultiDnsClient {
         while (futures.stream().allMatch(Future::isDone)) {
             Thread.sleep(50);
         }
-        return Config.getConfig().getMergerConfig().getMerger().mergeResponds(request, clients, futures.stream().map(now -> {
+        return futures.stream().map(now -> {
             try {
                 return now.get();
             } catch (InterruptedException | ExecutionException e) {
                 return null;
             }
-        }).collect(Collectors.toList()));
+        }).collect(Collectors.toList());
     }
 
     private DirectDnsClient[] generateDirectDnsClients() throws SSLException {

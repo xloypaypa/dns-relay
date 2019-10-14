@@ -1,8 +1,8 @@
 package online.xloypaypa.dns.relay.network.merger;
 
-import com.google.gson.JsonArray;
 import com.google.protobuf.ByteString;
 import coredns.dns.Dns;
+import online.xloypaypa.dns.relay.config.Config;
 import online.xloypaypa.dns.relay.dns.DNSMessage;
 import online.xloypaypa.dns.relay.dns.DNSParseException;
 import online.xloypaypa.dns.relay.dns.DNSQuestion;
@@ -24,9 +24,9 @@ public class ChinaDnsMerger extends DefaultMerger {
     private static final Logger logger = Logger.getLogger(ChinaDnsMerger.class.getName());
 
     @Override
-    public Dns.DnsPacket mergeResponds(Dns.DnsPacket request, JsonArray clients, List<Dns.DnsPacket> responds) {
+    public Dns.DnsPacket mergeResponds(Dns.DnsPacket request, List<Dns.DnsPacket> responds) {
         try {
-            List<CheckableDNsMessage> checkableDNSMessages = getCheckableDNSMessages(responds, clients);
+            List<CheckableDNsMessage> checkableDNSMessages = getCheckableDNSMessages(responds);
             AnswersMapForQuestions answersMapForQuestions = new AnswersMapForQuestions();
             DNSQuestion[] questions = DnsMessageParser.parse(request.getMsg().toByteArray()).getQuestions();
             for (DNSQuestion now : questions) {
@@ -38,7 +38,7 @@ public class ChinaDnsMerger extends DefaultMerger {
             return buildRespond(responds, checkableDNSMessages, answersMapForQuestions);
         } catch (Exception e) {
             e.printStackTrace();
-            return super.mergeResponds(request, clients, responds);
+            return super.mergeResponds(request, responds);
         }
     }
 
@@ -106,13 +106,13 @@ public class ChinaDnsMerger extends DefaultMerger {
         return !isChinaIP && respond.chinaOnly;
     }
 
-    private List<CheckableDNsMessage> getCheckableDNSMessages(List<Dns.DnsPacket> responds, JsonArray clients) {
+    private List<CheckableDNsMessage> getCheckableDNSMessages(List<Dns.DnsPacket> responds) {
         List<CheckableDNsMessage> result = new ArrayList<>();
         for (int i = 0; i < responds.size(); i++) {
             Dns.DnsPacket now = responds.get(i);
             boolean chinaOnly;
             try {
-                chinaOnly = clients.get(i).getAsJsonObject().get("chinaOnly").getAsBoolean();
+                chinaOnly = Config.getConfig().getMergerConfig().isChinaOnly(i);
             } catch (Exception e) {
                 chinaOnly = false;
             }

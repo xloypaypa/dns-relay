@@ -35,7 +35,7 @@ public class Config {
         JsonObject config = new Gson().fromJson(Files.readString(Path.of(configPath)), JsonObject.class);
         this.serverConfig = new ServerConfig(config.get("server").getAsJsonObject());
         this.upStreamConfig = new UpStreamConfig(config.get("upstream").getAsJsonObject());
-        this.mergerConfig = new MergerConfig(config.get("merger").getAsString());
+        this.mergerConfig = new MergerConfig(config.get("merger").getAsJsonObject());
     }
 
     public ServerConfig getServerConfig() {

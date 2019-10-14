@@ -8,7 +8,12 @@
     },
     "threads": 5
   },
-  "merger": "chinaIP",
+  "merger": {
+    "type": "chinaIP",
+    "chinaOnly": [
+      0
+    ]
+  },
   "upstream": {
     "upstreams": [
       {
@@ -16,8 +21,7 @@
         "port": 1443,
         "ssl": {
           "enable": false
-        },
-        "chinaOnly": true
+        }
       },
       {
         "host": "127.0.0.1",
@@ -29,5 +33,4 @@
       }
     ]
   }
-
 }
