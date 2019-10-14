@@ -4,7 +4,7 @@ import io.grpc.Server;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyServerBuilder;
 import io.netty.handler.ssl.SslContextBuilder;
-import online.xloypaypa.dns.relay.config.ServerConfig;
+import online.xloypaypa.dns.relay.config.ServerConfigImpl;
 import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
 import online.xloypaypa.dns.relay.network.server.util.DnsServiceImpl;
 
@@ -17,30 +17,30 @@ public class DnsServer {
     private static final Logger logger = Logger.getLogger(DnsServer.class.getName());
 
     private Server server;
-    private final ServerConfig serverConfig;
+    private final ServerConfigImpl serverConfigImpl;
     private final MultiDnsClient multiDnsClient;
 
-    public DnsServer(ServerConfig serverConfig, MultiDnsClient multiDnsClient) {
-        this.serverConfig = serverConfig;
+    public DnsServer(ServerConfigImpl serverConfigImpl, MultiDnsClient multiDnsClient) {
+        this.serverConfigImpl = serverConfigImpl;
         this.multiDnsClient = multiDnsClient;
     }
 
     private SslContextBuilder getSslContextBuilder() {
-        ServerConfig.SSL ssl = this.serverConfig.getSsl();
+        ServerConfigImpl.SSL ssl = this.serverConfigImpl.getSsl();
         SslContextBuilder sslClientContextBuilder = SslContextBuilder.forServer(new File(ssl.getCert()),
                 new File(ssl.getPrivateKey()));
         return GrpcSslContexts.configure(sslClientContextBuilder);
     }
 
     public void start() throws IOException {
-        NettyServerBuilder nettyServerBuilder = NettyServerBuilder.forPort(this.serverConfig.getPort());
-        nettyServerBuilder.executor(Executors.newFixedThreadPool(this.serverConfig.getNumberOfThread()));
+        NettyServerBuilder nettyServerBuilder = NettyServerBuilder.forPort(this.serverConfigImpl.getPort());
+        nettyServerBuilder.executor(Executors.newFixedThreadPool(this.serverConfigImpl.getNumberOfThread()));
         nettyServerBuilder.addService(new DnsServiceImpl(this.multiDnsClient));
-        if (this.serverConfig.getSsl().isEnable()) {
+        if (this.serverConfigImpl.getSsl().isEnable()) {
             nettyServerBuilder.sslContext(getSslContextBuilder().build());
         }
         server = nettyServerBuilder.build().start();
-        logger.info("Server started, listening on " + this.serverConfig.getPort());
+        logger.info("Server started, listening on " + this.serverConfigImpl.getPort());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.err.println("*** shutting down gRPC server since JVM is shutting down");
             DnsServer.this.stop();

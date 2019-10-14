@@ -7,11 +7,11 @@ import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class UpStreamConfig {
+public class UpStreamConfigImpl {
 
     private final MultiDnsClient multiDnsClient;
 
-    UpStreamConfig(JsonObject upstreamConfig) {
+    UpStreamConfigImpl(JsonObject upstreamConfig) {
         JsonArray clients = upstreamConfig.get("upstreams").getAsJsonArray();
         int threads = clients.size() * 2;
         if (upstreamConfig.has("threads")) {

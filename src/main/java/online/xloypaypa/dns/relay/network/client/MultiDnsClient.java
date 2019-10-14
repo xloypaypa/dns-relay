@@ -2,7 +2,7 @@ package online.xloypaypa.dns.relay.network.client;
 
 import com.google.gson.JsonArray;
 import coredns.dns.Dns;
-import online.xloypaypa.dns.relay.config.ClientConfig;
+import online.xloypaypa.dns.relay.config.ClientConfigImpl;
 import online.xloypaypa.dns.relay.network.client.util.DirectDnsClient;
 
 import javax.net.ssl.SSLException;
@@ -45,7 +45,7 @@ public class MultiDnsClient {
     private DirectDnsClient[] generateDirectDnsClients() throws SSLException {
         DirectDnsClient[] directDnsClients = new DirectDnsClient[clients.size()];
         for (int i = 0; i < clients.size(); i++) {
-            directDnsClients[i] = new DirectDnsClient(new ClientConfig(clients.get(i).getAsJsonObject()));
+            directDnsClients[i] = new DirectDnsClient(new ClientConfigImpl(clients.get(i).getAsJsonObject()));
         }
         return directDnsClients;
     }

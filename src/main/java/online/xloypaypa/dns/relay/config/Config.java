@@ -27,26 +27,26 @@ public class Config {
         return config;
     }
 
-    private final ServerConfig serverConfig;
-    private final UpStreamConfig upStreamConfig;
-    private final MergerConfig mergerConfig;
+    private final ServerConfigImpl serverConfigImpl;
+    private final UpStreamConfigImpl upStreamConfigImpl;
+    private final MergerConfigImpl mergerConfigImpl;
 
     private Config(String configPath) throws IOException {
         JsonObject config = new Gson().fromJson(Files.readString(Path.of(configPath)), JsonObject.class);
-        this.serverConfig = new ServerConfig(config.get("server").getAsJsonObject());
-        this.upStreamConfig = new UpStreamConfig(config.get("upstream").getAsJsonObject());
-        this.mergerConfig = new MergerConfig(config.get("merger").getAsJsonObject());
+        this.serverConfigImpl = new ServerConfigImpl(config.get("server").getAsJsonObject());
+        this.upStreamConfigImpl = new UpStreamConfigImpl(config.get("upstream").getAsJsonObject());
+        this.mergerConfigImpl = new MergerConfigImpl(config.get("merger").getAsJsonObject());
     }
 
-    public ServerConfig getServerConfig() {
-        return serverConfig;
+    public ServerConfigImpl getServerConfigImpl() {
+        return serverConfigImpl;
     }
 
-    public UpStreamConfig getUpStreamConfig() {
-        return upStreamConfig;
+    public UpStreamConfigImpl getUpStreamConfigImpl() {
+        return upStreamConfigImpl;
     }
 
-    public MergerConfig getMergerConfig() {
-        return mergerConfig;
+    public MergerConfigImpl getMergerConfigImpl() {
+        return mergerConfigImpl;
     }
 }

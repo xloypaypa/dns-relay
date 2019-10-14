@@ -112,7 +112,7 @@ public class ChinaDnsMerger extends DefaultMerger {
             Dns.DnsPacket now = responds.get(i);
             boolean chinaOnly;
             try {
-                chinaOnly = Config.getConfig().getMergerConfig().isChinaOnly(i);
+                chinaOnly = Config.getConfig().getMergerConfigImpl().isChinaOnly(i);
             } catch (Exception e) {
                 chinaOnly = false;
             }

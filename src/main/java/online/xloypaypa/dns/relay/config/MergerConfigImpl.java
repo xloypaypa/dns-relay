@@ -10,12 +10,12 @@ import online.xloypaypa.dns.relay.network.merger.MultiRespondsMerger;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MergerConfig {
+public class MergerConfigImpl {
 
     private Set<Integer> chinaOnly;
     private final MultiRespondsMerger merger;
 
-    MergerConfig(JsonObject mergerConfig) {
+    MergerConfigImpl(JsonObject mergerConfig) {
         String type = mergerConfig.get("type").getAsString();
         switch (type) {
             case "chinaIP":

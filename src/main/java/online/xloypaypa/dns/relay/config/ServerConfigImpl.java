@@ -2,13 +2,13 @@ package online.xloypaypa.dns.relay.config;
 
 import com.google.gson.JsonObject;
 
-public class ServerConfig {
+public class ServerConfigImpl {
 
     private final int port;
     private final SSL ssl;
     private final int numberOfThread;
 
-    ServerConfig(JsonObject serverConfig) {
+    ServerConfigImpl(JsonObject serverConfig) {
         this.port = serverConfig.get("port").getAsInt();
         JsonObject sslConfig = serverConfig.has("ssl") ? serverConfig.get("ssl").getAsJsonObject() : null;
         if (sslConfig != null && sslConfig.get("enable").getAsBoolean()) {
