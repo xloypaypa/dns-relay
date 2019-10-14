@@ -11,11 +11,16 @@ public class Config {
 
     private static Config config = null;
 
-    public static Config loadConfig(String configPath) throws IOException {
+    public static Config getConfig() {
         if (config == null) {
             synchronized (Config.class) {
                 if (config == null) {
-                    config = new Config(configPath);
+                    try {
+                        config = new Config("./config.json");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        System.exit(1);
+                    }
                 }
             }
         }
@@ -24,11 +29,13 @@ public class Config {
 
     private final ServerConfig serverConfig;
     private final UpStreamConfig upStreamConfig;
+    private final MergerConfig mergerConfig;
 
     private Config(String configPath) throws IOException {
         JsonObject config = new Gson().fromJson(Files.readString(Path.of(configPath)), JsonObject.class);
         this.serverConfig = new ServerConfig(config.get("server").getAsJsonObject());
         this.upStreamConfig = new UpStreamConfig(config.get("upstream").getAsJsonObject());
+        this.mergerConfig = new MergerConfig(config.get("merger").getAsString());
     }
 
     public ServerConfig getServerConfig() {
@@ -37,5 +44,9 @@ public class Config {
 
     public UpStreamConfig getUpStreamConfig() {
         return upStreamConfig;
+    }
+
+    public MergerConfig getMergerConfig() {
+        return mergerConfig;
     }
 }

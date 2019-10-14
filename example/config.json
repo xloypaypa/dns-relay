@@ -8,9 +8,9 @@
     },
     "threads": 5
   },
+  "merger": "chinaIP",
   "upstream": {
     "type": "multi",
-    "merger": "chinaIP",
     "clients": [
       {
         "host": "127.0.0.1",

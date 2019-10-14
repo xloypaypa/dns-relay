@@ -3,7 +3,7 @@ package online.xloypaypa.dns.relay.network.client;
 import com.google.gson.JsonArray;
 import coredns.dns.Dns;
 import online.xloypaypa.dns.relay.config.ClientConfig;
-import online.xloypaypa.dns.relay.network.merger.MultiRespondsMerger;
+import online.xloypaypa.dns.relay.config.Config;
 
 import javax.net.ssl.SSLException;
 import java.util.Arrays;
@@ -18,9 +18,8 @@ public class MultiDnsClient implements DnsClient {
     private final JsonArray clients;
     private final DirectDnsClient[] directDnsClients;
     private final ExecutorService executor;
-    private final MultiRespondsMerger multiRespondsMerger;
 
-    public MultiDnsClient(JsonArray clients, ExecutorService executor, MultiRespondsMerger multiRespondsMerger) throws SSLException {
+    public MultiDnsClient(JsonArray clients, ExecutorService executor) throws SSLException {
         this.clients = clients;
         DirectDnsClient[] directDnsClients = new DirectDnsClient[clients.size()];
         for (int i = 0; i < clients.size(); i++) {
@@ -28,7 +27,6 @@ public class MultiDnsClient implements DnsClient {
         }
         this.directDnsClients = directDnsClients;
         this.executor = executor;
-        this.multiRespondsMerger = multiRespondsMerger;
     }
 
     @Override
@@ -40,7 +38,7 @@ public class MultiDnsClient implements DnsClient {
         while (futures.stream().allMatch(Future::isDone)) {
             Thread.sleep(50);
         }
-        return this.multiRespondsMerger.mergeResponds(request, clients, futures.stream().map(now -> {
+        return Config.getConfig().getMergerConfig().getMerger().mergeResponds(request, clients, futures.stream().map(now -> {
             try {
                 return now.get();
             } catch (InterruptedException | ExecutionException e) {

@@ -21,7 +21,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        Main main = new Main(Config.loadConfig("./config.json"));
+        Main main = new Main(Config.getConfig());
         main.startServer();
     }
 
