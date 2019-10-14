@@ -4,4 +4,4 @@ FROM xloypaypa/dns-relay
 #ADD /key /key
 
 # always need a config.json
-ADD config.json /
+ADD config.clj /

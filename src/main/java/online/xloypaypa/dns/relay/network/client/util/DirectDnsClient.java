@@ -5,7 +5,7 @@ import coredns.dns.DnsServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyChannelBuilder;
-import online.xloypaypa.dns.relay.config.ClientConfigImpl;
+import online.xloypaypa.dns.relay.config.ClientConfig;
 
 import javax.net.ssl.SSLException;
 import java.util.concurrent.TimeUnit;
@@ -15,10 +15,10 @@ public class DirectDnsClient {
     private final ManagedChannel channel;
     private final DnsServiceGrpc.DnsServiceBlockingStub blockingStub;
 
-    public DirectDnsClient(ClientConfigImpl clientConfigImpl) throws SSLException {
-        NettyChannelBuilder nettyChannelBuilder = NettyChannelBuilder.forAddress(clientConfigImpl.getHost(), clientConfigImpl.getPort());
-        if (clientConfigImpl.getSsl().isEnable()) {
-            nettyChannelBuilder.overrideAuthority(clientConfigImpl.getSsl().getServerName())
+    public DirectDnsClient(ClientConfig clientConfig) throws SSLException {
+        NettyChannelBuilder nettyChannelBuilder = NettyChannelBuilder.forAddress(clientConfig.getHost(), clientConfig.getPort());
+        if (clientConfig.getSsl().isEnable()) {
+            nettyChannelBuilder.overrideAuthority(clientConfig.getSsl().getServerName())
                     .sslContext(GrpcSslContexts.forClient().build());
         } else {
             nettyChannelBuilder.usePlaintext();

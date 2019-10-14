@@ -19,7 +19,7 @@ public class DnsServiceImpl extends DnsServiceGrpc.DnsServiceImplBase {
     public void query(Dns.DnsPacket request, StreamObserver<Dns.DnsPacket> responseObserver) {
         try {
             List<Dns.DnsPacket> allResponds = this.multiDnsClient.query(request);
-            Dns.DnsPacket responds = Config.getConfig().getMergerConfigImpl().getMerger().mergeResponds(request, allResponds);
+            Dns.DnsPacket responds = Config.getConfig().getMergerConfig().getMerger().mergeResponds(request, allResponds);
             responseObserver.onNext(responds);
         } catch (Exception e) {
             e.printStackTrace();

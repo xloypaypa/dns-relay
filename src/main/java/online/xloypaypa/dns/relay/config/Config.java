@@ -1,9 +1,7 @@
 package online.xloypaypa.dns.relay.config;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -15,8 +13,10 @@ public class Config {
         if (config == null) {
             synchronized (Config.class) {
                 if (config == null) {
+                    new clojure.lang.RT();
                     try {
-                        config = new Config("./config.json");
+                        String configCode = Files.readString(Path.of("./config.clj"));
+                        config = (Config) clojure.lang.Compiler.load(new StringReader(configCode));
                     } catch (IOException e) {
                         e.printStackTrace();
                         System.exit(1);
@@ -27,26 +27,25 @@ public class Config {
         return config;
     }
 
-    private final ServerConfigImpl serverConfigImpl;
-    private final UpStreamConfigImpl upStreamConfigImpl;
-    private final MergerConfigImpl mergerConfigImpl;
+    private final ServerConfig serverConfig;
+    private final UpstreamConfig upstreamConfig;
+    private final MergerConfig mergerConfig;
 
-    private Config(String configPath) throws IOException {
-        JsonObject config = new Gson().fromJson(Files.readString(Path.of(configPath)), JsonObject.class);
-        this.serverConfigImpl = new ServerConfigImpl(config.get("server").getAsJsonObject());
-        this.upStreamConfigImpl = new UpStreamConfigImpl(config.get("upstream").getAsJsonObject());
-        this.mergerConfigImpl = new MergerConfigImpl(config.get("merger").getAsJsonObject());
+    public Config(ServerConfig serverConfig, UpstreamConfig upstreamConfig, MergerConfig mergerConfig) {
+        this.serverConfig = serverConfig;
+        this.upstreamConfig = upstreamConfig;
+        this.mergerConfig = mergerConfig;
     }
 
-    public ServerConfigImpl getServerConfigImpl() {
-        return serverConfigImpl;
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 
-    public UpStreamConfigImpl getUpStreamConfigImpl() {
-        return upStreamConfigImpl;
+    public UpstreamConfig getUpstreamConfig() {
+        return upstreamConfig;
     }
 
-    public MergerConfigImpl getMergerConfigImpl() {
-        return mergerConfigImpl;
+    public MergerConfig getMergerConfig() {
+        return mergerConfig;
     }
 }

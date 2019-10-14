@@ -1,8 +1,7 @@
 package online.xloypaypa.dns.relay.network.client;
 
-import com.google.gson.JsonArray;
 import coredns.dns.Dns;
-import online.xloypaypa.dns.relay.config.ClientConfigImpl;
+import online.xloypaypa.dns.relay.config.ClientConfig;
 import online.xloypaypa.dns.relay.network.client.util.DirectDnsClient;
 
 import javax.net.ssl.SSLException;
@@ -15,11 +14,11 @@ import java.util.stream.Collectors;
 
 public class MultiDnsClient {
 
-    private final JsonArray clients;
+    private final ClientConfig[] clientConfigs;
     private final ExecutorService executor;
 
-    public MultiDnsClient(JsonArray clients, ExecutorService executor) {
-        this.clients = clients;
+    public MultiDnsClient(List<ClientConfig> clientConfigs, ExecutorService executor) {
+        this.clientConfigs = clientConfigs.toArray(ClientConfig[]::new);
         this.executor = executor;
     }
 
@@ -43,9 +42,9 @@ public class MultiDnsClient {
     }
 
     private DirectDnsClient[] generateDirectDnsClients() throws SSLException {
-        DirectDnsClient[] directDnsClients = new DirectDnsClient[clients.size()];
-        for (int i = 0; i < clients.size(); i++) {
-            directDnsClients[i] = new DirectDnsClient(new ClientConfigImpl(clients.get(i).getAsJsonObject()));
+        DirectDnsClient[] directDnsClients = new DirectDnsClient[this.clientConfigs.length];
+        for (int i = 0; i < this.clientConfigs.length; i++) {
+            directDnsClients[i] = new DirectDnsClient(clientConfigs[i]);
         }
         return directDnsClients;
     }

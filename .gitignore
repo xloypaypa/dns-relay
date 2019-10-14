@@ -3,4 +3,5 @@
 /build
 /.gradle
 /key
-config.json
+./config.json
+./config.clj
