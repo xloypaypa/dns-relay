@@ -1,14 +1,14 @@
-package online.xloypaypa.dns.relay.network.server;
+package online.xloypaypa.dns.relay.network.server.util;
 
 import coredns.dns.Dns;
 import coredns.dns.DnsServiceGrpc;
 import io.grpc.stub.StreamObserver;
 import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
 
-class DnsServiceImpl extends DnsServiceGrpc.DnsServiceImplBase {
+public class DnsServiceImpl extends DnsServiceGrpc.DnsServiceImplBase {
     private final MultiDnsClient multiDnsClient;
 
-    DnsServiceImpl(MultiDnsClient multiDnsClient) {
+    public DnsServiceImpl(MultiDnsClient multiDnsClient) {
         this.multiDnsClient = multiDnsClient;
     }
 

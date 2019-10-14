@@ -6,6 +6,7 @@ import io.grpc.netty.NettyServerBuilder;
 import io.netty.handler.ssl.SslContextBuilder;
 import online.xloypaypa.dns.relay.config.ServerConfig;
 import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
+import online.xloypaypa.dns.relay.network.server.util.DnsServiceImpl;
 
 import java.io.File;
 import java.io.IOException;

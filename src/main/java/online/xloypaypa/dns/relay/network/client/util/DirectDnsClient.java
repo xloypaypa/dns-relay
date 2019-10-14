@@ -15,7 +15,7 @@ public class DirectDnsClient {
     private final ManagedChannel channel;
     private final DnsServiceGrpc.DnsServiceBlockingStub blockingStub;
 
-    DirectDnsClient(ClientConfig clientConfig) throws SSLException {
+    public DirectDnsClient(ClientConfig clientConfig) throws SSLException {
         NettyChannelBuilder nettyChannelBuilder = NettyChannelBuilder.forAddress(clientConfig.getHost(), clientConfig.getPort());
         if (clientConfig.getSsl().isEnable()) {
             nettyChannelBuilder.overrideAuthority(clientConfig.getSsl().getServerName())
