@@ -14,7 +14,7 @@ public class Main {
     }
 
     private void startServer() throws IOException, InterruptedException {
-        DnsServer server = new DnsServer(this.config.getServerConfig(), () -> config.getUpStreamConfig().getDnsClientBuilder().buildDnsClient());
+        DnsServer server = new DnsServer(this.config.getServerConfig(), config.getUpStreamConfig().getMultiDnsClient());
         server.start();
         server.blockUntilShutdown();
 

@@ -5,7 +5,7 @@ import io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.NettyServerBuilder;
 import io.netty.handler.ssl.SslContextBuilder;
 import online.xloypaypa.dns.relay.config.ServerConfig;
-import online.xloypaypa.dns.relay.network.client.DnsClientBuilder;
+import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,11 +17,11 @@ public class DnsServer {
 
     private Server server;
     private final ServerConfig serverConfig;
-    private final DnsClientBuilder dnsClientBuilder;
+    private final MultiDnsClient multiDnsClient;
 
-    public DnsServer(ServerConfig serverConfig, DnsClientBuilder dnsClientBuilder) {
+    public DnsServer(ServerConfig serverConfig, MultiDnsClient multiDnsClient) {
         this.serverConfig = serverConfig;
-        this.dnsClientBuilder = dnsClientBuilder;
+        this.multiDnsClient = multiDnsClient;
     }
 
     private SslContextBuilder getSslContextBuilder() {
@@ -34,7 +34,7 @@ public class DnsServer {
     public void start() throws IOException {
         NettyServerBuilder nettyServerBuilder = NettyServerBuilder.forPort(this.serverConfig.getPort());
         nettyServerBuilder.executor(Executors.newFixedThreadPool(this.serverConfig.getNumberOfThread()));
-        nettyServerBuilder.addService(new DnsServiceImpl(this.dnsClientBuilder));
+        nettyServerBuilder.addService(new DnsServiceImpl(this.multiDnsClient));
         if (this.serverConfig.getSsl().isEnable()) {
             nettyServerBuilder.sslContext(getSslContextBuilder().build());
         }

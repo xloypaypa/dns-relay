@@ -10,8 +10,7 @@
   },
   "merger": "chinaIP",
   "upstream": {
-    "type": "multi",
-    "clients": [
+    "upstreams": [
       {
         "host": "127.0.0.1",
         "port": 1443,

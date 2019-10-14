@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import coredns.dns.Dns;
 import online.xloypaypa.dns.relay.config.ClientConfig;
 import online.xloypaypa.dns.relay.config.Config;
+import online.xloypaypa.dns.relay.network.client.util.DirectDnsClient;
 
 import javax.net.ssl.SSLException;
 import java.util.Arrays;
@@ -13,24 +14,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-public class MultiDnsClient implements DnsClient {
+public class MultiDnsClient {
 
     private final JsonArray clients;
-    private final DirectDnsClient[] directDnsClients;
     private final ExecutorService executor;
 
-    public MultiDnsClient(JsonArray clients, ExecutorService executor) throws SSLException {
+    public MultiDnsClient(JsonArray clients, ExecutorService executor) {
         this.clients = clients;
-        DirectDnsClient[] directDnsClients = new DirectDnsClient[clients.size()];
-        for (int i = 0; i < clients.size(); i++) {
-            directDnsClients[i] = new DirectDnsClient(new ClientConfig(clients.get(i).getAsJsonObject()));
-        }
-        this.directDnsClients = directDnsClients;
         this.executor = executor;
     }
 
-    @Override
-    public Dns.DnsPacket query(Dns.DnsPacket request) throws InterruptedException {
+    public Dns.DnsPacket query(Dns.DnsPacket request) throws InterruptedException, SSLException {
+        DirectDnsClient[] directDnsClients = generateDirectDnsClients();
+
         List<Future<Dns.DnsPacket>> futures = Arrays.stream(directDnsClients)
                 .map(directDnsClient -> executor.submit(() -> directDnsClient.query(request)))
                 .collect(Collectors.toList());
@@ -45,6 +41,14 @@ public class MultiDnsClient implements DnsClient {
                 return null;
             }
         }).collect(Collectors.toList()));
+    }
+
+    private DirectDnsClient[] generateDirectDnsClients() throws SSLException {
+        DirectDnsClient[] directDnsClients = new DirectDnsClient[clients.size()];
+        for (int i = 0; i < clients.size(); i++) {
+            directDnsClients[i] = new DirectDnsClient(new ClientConfig(clients.get(i).getAsJsonObject()));
+        }
+        return directDnsClients;
     }
 
 }

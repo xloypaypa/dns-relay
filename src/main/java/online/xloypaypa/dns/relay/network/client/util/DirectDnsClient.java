@@ -1,4 +1,4 @@
-package online.xloypaypa.dns.relay.network.client;
+package online.xloypaypa.dns.relay.network.client.util;
 
 import coredns.dns.Dns;
 import coredns.dns.DnsServiceGrpc;
@@ -10,7 +10,7 @@ import online.xloypaypa.dns.relay.config.ClientConfig;
 import javax.net.ssl.SSLException;
 import java.util.concurrent.TimeUnit;
 
-public class DirectDnsClient implements DnsClient {
+public class DirectDnsClient {
 
     private final ManagedChannel channel;
     private final DnsServiceGrpc.DnsServiceBlockingStub blockingStub;
@@ -31,7 +31,6 @@ public class DirectDnsClient implements DnsClient {
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
 
-    @Override
     public Dns.DnsPacket query(Dns.DnsPacket request) throws InterruptedException {
         Dns.DnsPacket result;
         try {
