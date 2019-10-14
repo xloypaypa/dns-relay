@@ -1,0 +1,34 @@
+{
+  "server": {
+    "port": 1234,
+    "ssl": {
+      "enable": true,
+      "cert": "/you/public/path/key.pem",
+      "privateKey": "/you/private/path/private.pem"
+    },
+    "threads": 5
+  },
+  "upstream": {
+    "type": "multi",
+    "merger": "chinaIP",
+    "clients": [
+      {
+        "host": "127.0.0.1",
+        "port": 1443,
+        "ssl": {
+          "enable": false
+        },
+        "chinaOnly": true
+      },
+      {
+        "host": "127.0.0.1",
+        "port": 1444,
+        "ssl": {
+          "enable": true,
+          "serverName": "upstream.domain.com"
+        }
+      }
+    ]
+  }
+
+}
