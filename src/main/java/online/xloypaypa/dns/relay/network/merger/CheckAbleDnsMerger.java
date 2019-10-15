@@ -1,12 +1,9 @@
 package online.xloypaypa.dns.relay.network.merger;
 
-import com.google.protobuf.ByteString;
-import coredns.dns.Dns;
 import online.xloypaypa.dns.relay.dns.DNSMessage;
 import online.xloypaypa.dns.relay.dns.DNSParseException;
 import online.xloypaypa.dns.relay.dns.DNSQuestion;
 import online.xloypaypa.dns.relay.dns.DNSResourceRecord;
-import online.xloypaypa.dns.relay.dns.util.DnsMessageParser;
 import online.xloypaypa.dns.relay.dns.util.NameParser;
 import online.xloypaypa.dns.relay.network.merger.checker.IPCheckException;
 import online.xloypaypa.dns.relay.network.merger.checker.IPChecker;
@@ -29,11 +26,11 @@ public class CheckAbleDnsMerger extends DefaultMerger {
     }
 
     @Override
-    public Dns.DnsPacket mergeResponds(Dns.DnsPacket request, List<Dns.DnsPacket> responds) {
+    public DNSMessage mergeResponds(DNSMessage request, List<DNSMessage> responds) {
         try {
             List<CheckableDNsMessage> checkableDNSMessages = getCheckableDNSMessages(responds);
             AnswersMapForQuestions answersMapForQuestions = new AnswersMapForQuestions();
-            DNSQuestion[] questions = DnsMessageParser.parse(request.getMsg().toByteArray()).getQuestions();
+            DNSQuestion[] questions = request.getQuestions();
             for (DNSQuestion now : questions) {
                 if (now.getQType() == 1) {
                     List<Answer> answerForDomain = getNoBlockedAnswerForDomain(now.getName(), checkableDNSMessages);
@@ -47,13 +44,12 @@ public class CheckAbleDnsMerger extends DefaultMerger {
         }
     }
 
-    private Dns.DnsPacket buildRespond(List<Dns.DnsPacket> responds, List<CheckableDNsMessage> checkableDNsMessages, AnswersMapForQuestions answersMapForQuestions) throws DNSParseException {
+    private DNSMessage buildRespond(List<DNSMessage> responds, List<CheckableDNsMessage> checkableDNsMessages, AnswersMapForQuestions answersMapForQuestions) {
         for (int i = 0; i < responds.size(); i++) {
-            Dns.DnsPacket dnsPacket = responds.get(i);
+            DNSMessage dnsMessage = responds.get(i);
             CheckableDNsMessage checkableDNsMessage = checkableDNsMessages.get(i);
-            if (dnsPacket == null || checkableDNsMessage == null) continue;
+            if (dnsMessage == null || checkableDNsMessage == null) continue;
 
-            DNSMessage dnsMessage = DnsMessageParser.parse(dnsPacket.getMsg().toByteArray());
             List<DNSResourceRecord> answers = checkableDNsMessage.answers.stream()
                     .filter(now -> !now.checked)
                     .map(now -> now.dnsResourceRecord)
@@ -67,11 +63,9 @@ public class CheckAbleDnsMerger extends DefaultMerger {
             for (int j = 0; j < finalAnswers.length; j++) {
                 finalAnswers[j] = answers.get(j);
             }
-            DNSMessage finalDnsMessage = new DNSMessage(dnsMessage.getId(), dnsMessage.getFlags(), dnsMessage.getQuestions(),
-                    finalAnswers,
-                    dnsMessage.getNameServers(), dnsMessage.getAdditionalRecords());
 
-            return Dns.DnsPacket.newBuilder().setMsg(ByteString.copyFrom(DnsMessageParser.toBytes(finalDnsMessage))).build();
+            return new DNSMessage(dnsMessage.getId(), dnsMessage.getFlags(), dnsMessage.getQuestions(),
+                    finalAnswers, dnsMessage.getNameServers(), dnsMessage.getAdditionalRecords());
         }
         throw new RuntimeException("all responds is null");
     }
@@ -111,12 +105,12 @@ public class CheckAbleDnsMerger extends DefaultMerger {
         return !isValid;
     }
 
-    private List<CheckableDNsMessage> getCheckableDNSMessages(List<Dns.DnsPacket> responds) {
+    private List<CheckableDNsMessage> getCheckableDNSMessages(List<DNSMessage> responds) {
         List<CheckableDNsMessage> result = new ArrayList<>();
         for (int i = 0; i < responds.size(); i++) {
-            Dns.DnsPacket now = responds.get(i);
+            DNSMessage now = responds.get(i);
             try {
-                DNSResourceRecord[] answers = DnsMessageParser.parse(now.getMsg().toByteArray()).getAnswers();
+                DNSResourceRecord[] answers = now.getAnswers();
                 result.add(new CheckableDNsMessage(i, answers));
             } catch (Exception e) {
                 result.add(null);

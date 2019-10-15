@@ -30,10 +30,14 @@
 >   * default就是根据clients配置的顺序来的。以第一个有效的返回为返回。也就是说，如果第一个client返回的dns responds里说查询失败了，而第二个client返回了ip等结果。那么依然会以第一client那个失败的结果返回。当且仅当第一个client由于连不上、超时等情况导致没有返回时才会使用后续的dns。也就是说，默认的merger，认为排在前面的dns server更加可靠。
 >   * CheckAbleDnsMerger这个就更厉害啦。要求传入一个IPChecker。
 >       * IPChecker就只做isIPValid一件事。参数是clientIndex和IP地址。clientIndex就是前面upstream的clients的下标（毕竟是配置文件，令人难受就难受吧）。
+>       * ChinaOnlyChecker**是调淘宝的ip库**来判断ip是否是国内ip，如果404则认为是国外ip。example里就用的这个，并套了一个cache。
+>       * CacheAbleChecker要求传入一个做事的IPChecker和一个缓存清理时间。**手写的cache，就自求多福吧。**
+>       * example就是一个典型的只采纳114dns的国内ip，国外ip全部视为invalid的例子。因为只有在client下标为0的时候才去调ChinaOnlyChecker。
 
 # TODO
 >* ~~重构代码，拆分把merger独立出来，毕竟merge其实和client去拿到多个dns server的结果这件事情其实没什么关系。~~
 >* 重构dns请求解析代码……简直就是一坨屎……
 >* ~~引入clojure进行配置。**主要是因为目前判断ip的国家是直接用的淘宝的ip库**。显然，用json配置这个是不可能的，但又不想写死，所以妥妥的clojure。~~
 >* 引入ip校验。在merger里加一个配置叫做"verify":true，可结合chinaOnly使用。两个做的事情其实类似，只是一个是验证ip的归属地，一个是验证ip的证书是不是和查询的domain一致（这里默认全世界所有网站都是https的，如果连https都没有你还指望他能又cdn？能指望他对不同地区又多个ip？）。
->* merger传参优化。直接给已经转成对象的dns message更好些。
+>* ~~merger传参优化。直接给已经转成对象的dns message更好些。~~
+>* 引入靠谱的缓存框架。
