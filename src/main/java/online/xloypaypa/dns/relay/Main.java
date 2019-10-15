@@ -1,6 +1,7 @@
 package online.xloypaypa.dns.relay;
 
 import online.xloypaypa.dns.relay.config.Config;
+import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
 import online.xloypaypa.dns.relay.network.server.DnsServer;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ public class Main {
     }
 
     private void startServer() throws IOException, InterruptedException {
-        DnsServer server = new DnsServer(this.config.getServerConfig(), config.getUpstreamConfig().getMultiDnsClient());
+        DnsServer server = new DnsServer(this.config.getServerConfig(), new MultiDnsClient(config.getUpstreamConfig()));
         server.start();
         server.blockUntilShutdown();
 

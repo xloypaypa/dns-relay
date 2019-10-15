@@ -34,7 +34,7 @@ public class DnsServer {
 
     public void start() throws IOException {
         NettyServerBuilder nettyServerBuilder = NettyServerBuilder.forPort(this.serverConfig.getPort());
-        nettyServerBuilder.executor(Executors.newFixedThreadPool(this.serverConfig.getNumberOfThread()));
+        nettyServerBuilder.executor(this.serverConfig.getExecutor());
         nettyServerBuilder.addService(new DnsServiceImpl(this.multiDnsClient));
         if (this.serverConfig.getSsl().isEnable()) {
             nettyServerBuilder.sslContext(getSslContextBuilder().build());

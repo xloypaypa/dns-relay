@@ -1,10 +1,13 @@
 package online.xloypaypa.dns.relay.config;
 
-import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public interface UpstreamConfig {
 
-    MultiDnsClient getMultiDnsClient();
+    List<ClientConfig> getClientConfigs();
+
+    ExecutorService getExecutor();
 
     interface ClientConfig {
 

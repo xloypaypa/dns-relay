@@ -1,8 +1,10 @@
 package online.xloypaypa.dns.relay.config;
 
+import java.util.concurrent.ExecutorService;
+
 public interface ServerConfig {
 
-    int getNumberOfThread();
+    ExecutorService getExecutor();
 
     int getPort();
 

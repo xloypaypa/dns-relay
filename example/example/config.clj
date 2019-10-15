@@ -1,12 +1,11 @@
 (ns example.config
   (:import (online.xloypaypa.dns.relay.config ServerConfig ServerConfig$SSL UpstreamConfig$ClientConfig UpstreamConfig$ClientConfig$SSL UpstreamConfig MergerConfig Config)
-           (online.xloypaypa.dns.relay.network.client MultiDnsClient)
            (java.util.concurrent Executors)
            (online.xloypaypa.dns.relay.network.merger CheckAbleDnsMerger)
            (online.xloypaypa.dns.relay.network.merger.checker IPChecker ChinaOnlyChecker)))
 
 (def serverConfig (reify ServerConfig
-                    (getNumberOfThread [_] 4)
+                    (getExecutor [_] (Executors/newFixedThreadPool 4))
                     (getPort [_] 6565)
                     (getSsl [_] (new ServerConfig$SSL false nil nil))))
 
@@ -19,7 +18,8 @@
   (let [clients [(buildClientConfig "172.19.2.5" 1443 (new UpstreamConfig$ClientConfig$SSL false nil))
                  (buildClientConfig "172.19.2.4" 1443 (new UpstreamConfig$ClientConfig$SSL false nil))]]
     (def upstreamConfig (reify UpstreamConfig
-                          (getMultiDnsClient [_] (new MultiDnsClient clients (Executors/newFixedThreadPool 4)))))))
+                          (getClientConfigs [_] clients)
+                          (getExecutor [_] (Executors/newFixedThreadPool 4))))))
 
 (let [chinaOnlyChecker (new ChinaOnlyChecker)
       ipChecker (reify IPChecker

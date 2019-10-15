@@ -17,9 +17,9 @@ public class MultiDnsClient {
     private final UpstreamConfig.ClientConfig[] clientConfigs;
     private final ExecutorService executor;
 
-    public MultiDnsClient(List<UpstreamConfig.ClientConfig> clientConfigs, ExecutorService executor) {
-        this.clientConfigs = clientConfigs.toArray(UpstreamConfig.ClientConfig[]::new);
-        this.executor = executor;
+    public MultiDnsClient(UpstreamConfig upstreamConfig) {
+        this.clientConfigs = upstreamConfig.getClientConfigs().toArray(UpstreamConfig.ClientConfig[]::new);
+        this.executor = upstreamConfig.getExecutor();
     }
 
     public List<Dns.DnsPacket> query(Dns.DnsPacket request) throws InterruptedException, SSLException {
