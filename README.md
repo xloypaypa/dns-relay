@@ -3,16 +3,26 @@
 
 >a dns relay base on grpc. support merge responds from multiple upstream dns server.
 
-# 快速开始
+# 快速开始 quick start 
 >自己打image：
 >* gradle composeUp
 >* nslookup -port=1053 www.google.com 127.0.0.1
 >
 >用我打好的image
 >* 写Dockerfile
->* From xloypaypa/dns-relay
->* ADD ./your/clojure/config/path/config.clj /
->* docker build
+>   * From xloypaypa/dns-relay
+>   * ADD ./your/clojure/config/path/config.clj /
+>   * docker build
+
+>build docker images by yourself:
+>* gradle composeUp
+>* nslookup -port=1053 www.google.com 127.0.0.1
+>
+>use my docker image
+>* write your Dockerfile
+>   * From xloypaypa/dns-relay
+>   * ADD ./your/clojure/config/path/config.clj /
+>   * docker build
 
 # 使用建议 using suggestions
 >众所周知，dns是用的udp，并且大多数时候使用53端口。所以建议结合[coredns](https://coredns.io/)，并使用[grpc](https://coredns.io/plugins/grpc/)插件（似乎这个插件在tls会有点小问题）。
@@ -21,8 +31,12 @@
 >
 >由于配置是clojure写成的。一方面可以只把config.clj当作完整的配置；另一方面config.clj可以只是一个入口，所以可以在里面写读文件、调api拿上游配置之类的骚操作。
 
-# 配置 config
->[example](https://github.com/xloypaypa/dns-relay/tree/master/example)里的配置已经比较清楚了。只有以下几点需要说一下。
+>As we know, dns is based on upd, and using port 53 majorly. So I suggest to use it with [coredns](https://coredns.io/), And use [grpc](https://coredns.io/plugins/grpc/) plugin (looks like this plugin have some issue with tls)。
+>
+>Because of the majority feature of thie project it filter the results of dns request. Also because I'm lazy :p. So there aren't any cache except the cache for result of ip validation (I wrote it, not really stable). So my suggestion is use like example. Set up coredns servers on the front and back for this. And enable [cache](https://coredns.io/plugins/cache/) plugin。 
+
+# 配置 configuration
+>[example](https://github.com/xloypaypa/dns-relay/tree/master/example)里的配置已经比较清楚了。
 >* 配置只能用clojure写，而且只能是在运行路径下的clojure.clj，并且这段Clojure脚本要返回一个online.xloypaypa.dns.relay.config.Config对象。
 >* Config对象只需要new出来就好，需要三个参数：serverConfig，upstreamConfig和mergerConfig。
 >* ServerConfig就直接实现ServerConfig。
@@ -42,6 +56,8 @@
 >       * ChinaOnlyChecker**是调淘宝的ip库**来判断ip是否是国内ip，如果404则认为是国外ip。example里就用的这个，并套了一个cache。
 >       * CacheAbleChecker要求传入一个做事的IPChecker和一个缓存清理时间。**手写的cache，就自求多福吧。**
 >       * example就是一个典型的只采纳114dns的国内ip，国外ip全部视为invalid的例子。因为只有在client下标为0的时候才去调ChinaOnlyChecker。
+
+> the [example](https://github.com/xloypaypa/dns-relay/tree/master/example) is very clear. Things could be easier if you read the code directly.
 
 # TODO
 >* ~~重构代码，拆分把merger独立出来，毕竟merge其实和client去拿到多个dns server的结果这件事情其实没什么关系。~~
