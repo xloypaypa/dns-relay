@@ -92,4 +92,5 @@ clean.dependsOn(deleteExamplePacakge)
 buildAndMovePackage.dependsOn(deleteExamplePacakge)
 buildAndMovePackage.dependsOn(build)
 
+composeUp.dependsOn(buildAndMovePackage)
 composeBuild.dependsOn(buildAndMovePackage)
