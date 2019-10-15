@@ -1,0 +1,30 @@
+version: '3'
+networks:
+  local-dns-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.2.0/24
+services:
+  dns-8.network:
+    build: ./8
+    networks:
+      local-dns-net:
+        ipv4_address: 172.19.2.4
+  dns-114.network:
+    build: ./114
+    networks:
+      local-dns-net:
+        ipv4_address: 172.19.2.5
+  client:
+    build: ./client
+    ports:
+      - "1053:53/udp"
+    networks:
+      local-dns-net:
+        ipv4_address: 172.19.2.6
+  relay:
+    build: ./example
+    networks:
+      local-dns-net:
+        ipv4_address: 172.19.2.7

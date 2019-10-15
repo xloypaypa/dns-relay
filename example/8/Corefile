@@ -1,0 +1,11 @@
+grpc://.:1443 {
+    forward . tls://8.8.8.8 {
+        tls_servername dns.google
+    }
+    log
+    errors
+    cache {
+         success 5000
+         denial 2500
+    }
+}

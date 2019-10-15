@@ -2,16 +2,15 @@ package online.xloypaypa.dns.relay.network.merger;
 
 import com.google.protobuf.ByteString;
 import coredns.dns.Dns;
-import online.xloypaypa.dns.relay.config.Config;
 import online.xloypaypa.dns.relay.dns.DNSMessage;
 import online.xloypaypa.dns.relay.dns.DNSParseException;
 import online.xloypaypa.dns.relay.dns.DNSQuestion;
 import online.xloypaypa.dns.relay.dns.DNSResourceRecord;
 import online.xloypaypa.dns.relay.dns.util.DnsMessageParser;
 import online.xloypaypa.dns.relay.dns.util.NameParser;
-import online.xloypaypa.dns.relay.network.client.util.ChinaIPChecker;
+import online.xloypaypa.dns.relay.network.merger.checker.IPCheckException;
+import online.xloypaypa.dns.relay.network.merger.checker.IPChecker;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,8 +19,14 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class ChinaDnsMerger extends DefaultMerger {
-    private static final Logger logger = Logger.getLogger(ChinaDnsMerger.class.getName());
+public class CheckAbleDnsMerger extends DefaultMerger {
+    private static final Logger logger = Logger.getLogger(CheckAbleDnsMerger.class.getName());
+
+    private final IPChecker ipChecker;
+
+    public CheckAbleDnsMerger(IPChecker ipChecker) {
+        this.ipChecker = ipChecker;
+    }
 
     @Override
     public Dns.DnsPacket mergeResponds(Dns.DnsPacket request, List<Dns.DnsPacket> responds) {
@@ -71,7 +76,7 @@ public class ChinaDnsMerger extends DefaultMerger {
         throw new RuntimeException("all responds is null");
     }
 
-    private List<Answer> getNoBlockedAnswerForDomain(String domain, List<CheckableDNsMessage> checkableDNsMessages) throws DNSParseException, IOException, InterruptedException {
+    private List<Answer> getNoBlockedAnswerForDomain(String domain, List<CheckableDNsMessage> checkableDNsMessages) throws DNSParseException, IPCheckException {
         for (int index = 0; index < checkableDNsMessages.size(); index++) {
             CheckableDNsMessage respond = checkableDNsMessages.get(index);
             if (respond == null) {
@@ -80,7 +85,7 @@ public class ChinaDnsMerger extends DefaultMerger {
             }
 
             List<Answer> answersRelated = getAnswersForQuestion(domain, respond);
-            boolean isBlock = checkIfNeedBlockAnswer(respond, answersRelated.stream().filter(now -> now.dnsResourceRecord.getRType() == 1).collect(Collectors.toList()));
+            boolean isBlock = checkIfNeedBlockAnswer(index, answersRelated.stream().filter(now -> now.dnsResourceRecord.getRType() == 1).collect(Collectors.toList()));
             for (Answer answer : answersRelated) {
                 answer.checked = true;
             }
@@ -94,31 +99,25 @@ public class ChinaDnsMerger extends DefaultMerger {
         throw new RuntimeException("all responds blocked");
     }
 
-    private boolean checkIfNeedBlockAnswer(CheckableDNsMessage respond, List<Answer> aTypeAnswer) throws IOException, InterruptedException {
+    private boolean checkIfNeedBlockAnswer(int clientIndex, List<Answer> aTypeAnswer) throws IPCheckException {
         List<String> ips = getRespondIP(aTypeAnswer);
-        boolean isChinaIP = false;
+        boolean isValid = false;
         for (String ip : ips) {
-            if (ChinaIPChecker.getChinaIPChecker().isChinaIp(ip)) {
-                isChinaIP = true;
+            if (this.ipChecker.isIPValid(clientIndex, ip)) {
+                isValid = true;
                 break;
             }
         }
-        return !isChinaIP && respond.chinaOnly;
+        return !isValid;
     }
 
     private List<CheckableDNsMessage> getCheckableDNSMessages(List<Dns.DnsPacket> responds) {
         List<CheckableDNsMessage> result = new ArrayList<>();
         for (int i = 0; i < responds.size(); i++) {
             Dns.DnsPacket now = responds.get(i);
-            boolean chinaOnly;
-            try {
-                chinaOnly = Config.getConfig().getMergerConfig().isChinaOnly(i);
-            } catch (Exception e) {
-                chinaOnly = false;
-            }
             try {
                 DNSResourceRecord[] answers = DnsMessageParser.parse(now.getMsg().toByteArray()).getAnswers();
-                result.add(new CheckableDNsMessage(i, answers, chinaOnly));
+                result.add(new CheckableDNsMessage(i, answers));
             } catch (Exception e) {
                 result.add(null);
             }
@@ -172,12 +171,10 @@ public class ChinaDnsMerger extends DefaultMerger {
     private static class CheckableDNsMessage {
         private int index;
         private List<Answer> answers;
-        private boolean chinaOnly;
 
-        private CheckableDNsMessage(int index, DNSResourceRecord[] answers, boolean chinaOnly) {
+        private CheckableDNsMessage(int index, DNSResourceRecord[] answers) {
             this.index = index;
             this.answers = new ArrayList<>();
-            this.chinaOnly = chinaOnly;
             for (DNSResourceRecord now : answers) {
                 this.answers.add(new Answer(now));
             }

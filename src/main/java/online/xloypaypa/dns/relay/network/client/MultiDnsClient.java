@@ -1,7 +1,7 @@
 package online.xloypaypa.dns.relay.network.client;
 
 import coredns.dns.Dns;
-import online.xloypaypa.dns.relay.config.ClientConfig;
+import online.xloypaypa.dns.relay.config.UpstreamConfig;
 import online.xloypaypa.dns.relay.network.client.util.DirectDnsClient;
 
 import javax.net.ssl.SSLException;
@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
 
 public class MultiDnsClient {
 
-    private final ClientConfig[] clientConfigs;
+    private final UpstreamConfig.ClientConfig[] clientConfigs;
     private final ExecutorService executor;
 
-    public MultiDnsClient(List<ClientConfig> clientConfigs, ExecutorService executor) {
-        this.clientConfigs = clientConfigs.toArray(ClientConfig[]::new);
+    public MultiDnsClient(List<UpstreamConfig.ClientConfig> clientConfigs, ExecutorService executor) {
+        this.clientConfigs = clientConfigs.toArray(UpstreamConfig.ClientConfig[]::new);
         this.executor = executor;
     }
 

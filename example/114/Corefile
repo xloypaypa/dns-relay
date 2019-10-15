@@ -1,0 +1,9 @@
+grpc://.:1443 {
+    forward . 114.114.114.114
+    log
+    errors
+    cache {
+        success 5000
+        denial 2500
+    }
+}

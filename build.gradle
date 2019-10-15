@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'com.google.protobuf' version '0.8.8'
     id 'idea'
+    id 'com.avast.gradle.docker-compose' version '0.7.1'
 }
 
 group 'online.xloypaypa'
@@ -61,7 +62,34 @@ sourceSets {
         java {
             srcDirs 'build/generated/source/proto/main/grpc'
             srcDirs 'build/generated/source/proto/main/java'
-            srcDir 'src/main/clojure'
+        }
+    }
+    test {
+        java {
+            resources {
+                srcDirs 'example'
+            }
         }
     }
 }
+
+dockerCompose {
+    useComposeFiles = ['.//example/docker-compose.yml']
+}
+
+task deleteExamplePacakge(type: Delete) {
+    delete 'example/example/dns-relay-1.0.0.jar'
+    followSymlinks = true
+}
+
+task buildAndMovePackage(type: Copy) {
+    from 'build/libs/dns-relay-1.0.0.jar'
+    into 'example/example/'
+}
+
+clean.dependsOn(deleteExamplePacakge)
+
+buildAndMovePackage.dependsOn(deleteExamplePacakge)
+buildAndMovePackage.dependsOn(build)
+
+composeBuild.dependsOn(buildAndMovePackage)

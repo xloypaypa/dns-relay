@@ -15,7 +15,8 @@ public class Config {
                 if (config == null) {
                     new clojure.lang.RT();
                     try {
-                        String configCode = Files.readString(Path.of("./config.clj"));
+                        String configPath = System.getProperty("configScript");
+                        String configCode = Files.readString(Path.of(configPath != null ? configPath : "./config.clj"));
                         config = (Config) clojure.lang.Compiler.load(new StringReader(configCode));
                     } catch (IOException e) {
                         e.printStackTrace();
