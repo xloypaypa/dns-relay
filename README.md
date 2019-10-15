@@ -4,13 +4,22 @@
 >a dns relay base on grpc. support merge responds from multiple upstream dns server.
 
 # 快速开始
+>自己打image：
 >* gradle composeUp
 >* nslookup -port=1053 www.google.com 127.0.0.1
+>
+>用我打好的image
+>* 写Dockerfile
+>* From xloypaypa/dns-relay
+>* ADD ./your/clojure/config/path/config.clj /
+>* docker build
 
 # 使用建议 using suggestions
 >众所周知，dns是用的udp，并且大多数时候使用53端口。所以建议结合[coredns](https://coredns.io/)，并使用[grpc](https://coredns.io/plugins/grpc/)插件（似乎这个插件在tls会有点小问题）。
 >
 >由于这个东西的重点是在于对dns结果的过滤，也为了减少工作量。所以除了对ip的验证结果有cache（随手撸的一个，要用的话自求多福）之外，没有任何的缓存。建议使用时和例子里一样，前后都套上coredns，并使用[cache](https://coredns.io/plugins/cache/)插件。
+>
+>由于配置是clojure写成的。一方面可以只把config.clj当作完整的配置；另一方面config.clj可以只是一个入口，所以可以在里面写读文件、调api拿上游配置之类的骚操作。
 
 # 配置 config
 >[example](https://github.com/xloypaypa/dns-relay/tree/master/example)里的配置已经比较清楚了。只有以下几点需要说一下。
