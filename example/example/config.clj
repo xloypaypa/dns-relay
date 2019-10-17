@@ -24,9 +24,9 @@
 (let [chinaOnlyChecker (new ChinaOnlyChecker)
       cacheAbleCheck (new CacheAbleChecker chinaOnlyChecker (* 1000 (* 60 (* 60))))
       ipChecker (reify IPChecker
-                  (isIPValid [_ clientIndex ip]
+                  (isIPValid [_ clientIndex domain ip]
                     (if (= clientIndex 0)
-                      (.isIPValid cacheAbleCheck clientIndex ip)
+                      (.isIPValid cacheAbleCheck clientIndex domain ip)
                       true)))]
   (def mergerConfig (reify MergerConfig
                       (getMerger [_] (new CheckAbleDnsMerger ipChecker)))))

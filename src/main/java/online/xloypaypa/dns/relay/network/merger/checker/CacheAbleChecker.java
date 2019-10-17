@@ -38,7 +38,7 @@ public class CacheAbleChecker implements IPChecker {
     }
 
     @Override
-    public boolean isIPValid(int clientIndex, String ip) throws IPCheckException {
+    public boolean isIPValid(int clientIndex, String domain, String ip) throws IPCheckException {
         Lock lock = this.lock.readLock();
         try {
             lock.lock();
@@ -47,7 +47,7 @@ public class CacheAbleChecker implements IPChecker {
                 result = this.inactiveCache.get(ip);
             }
             if (result == null) {
-                result = this.ipChecker.isIPValid(clientIndex, ip);
+                result = this.ipChecker.isIPValid(clientIndex, domain, ip);
             }
             this.activeCache.put(ip, result);
             return result;

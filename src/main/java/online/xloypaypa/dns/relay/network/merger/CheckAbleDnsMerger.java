@@ -79,7 +79,7 @@ public class CheckAbleDnsMerger extends DefaultMerger {
             }
 
             List<Answer> answersRelated = getAnswersForQuestion(domain, respond);
-            boolean isBlock = checkIfNeedBlockAnswer(index, answersRelated.stream().filter(now -> now.dnsResourceRecord.getRType() == 1).collect(Collectors.toList()));
+            boolean isBlock = checkIfNeedBlockAnswer(index, domain, answersRelated.stream().filter(now -> now.dnsResourceRecord.getRType() == 1).collect(Collectors.toList()));
             for (Answer answer : answersRelated) {
                 answer.checked = true;
             }
@@ -93,11 +93,11 @@ public class CheckAbleDnsMerger extends DefaultMerger {
         throw new RuntimeException("all responds blocked");
     }
 
-    private boolean checkIfNeedBlockAnswer(int clientIndex, List<Answer> aTypeAnswer) throws IPCheckException {
+    private boolean checkIfNeedBlockAnswer(int clientIndex, String domain, List<Answer> aTypeAnswer) throws IPCheckException {
         List<String> ips = getRespondIP(aTypeAnswer);
         boolean isValid = false;
         for (String ip : ips) {
-            if (this.ipChecker.isIPValid(clientIndex, ip)) {
+            if (this.ipChecker.isIPValid(clientIndex, domain, ip)) {
                 isValid = true;
                 break;
             }

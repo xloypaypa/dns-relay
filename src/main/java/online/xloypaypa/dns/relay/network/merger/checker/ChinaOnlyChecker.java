@@ -16,7 +16,7 @@ public class ChinaOnlyChecker implements IPChecker {
     private static final Logger logger = Logger.getLogger(ChinaOnlyChecker.class.getName());
 
     @Override
-    public boolean isIPValid(int clientIndex, String ip) throws IPCheckException {
+    public boolean isIPValid(int clientIndex, String domain, String ip) throws IPCheckException {
         logger.info("sending ip country request for " + ip);
         HttpClient httpClient = HttpClient.newBuilder().build();
         HttpRequest request = HttpRequest.newBuilder()
