@@ -23,6 +23,10 @@
 
 (let [chinaOnlyChecker (new ChinaOnlyChecker)
       ;certificateChecker (load-file "/certificateChecker.clj")
+      ;chinaOnlyAndMustCanGetCertificateChecker (reify IPChecker
+      ;                                           (isIPValid [_ clientIndex domain ip]
+      ;                                             (and (.isIPValid chinaOnlyChecker clientIndex domain ip)
+      ;                                                  (.isIPValid certificateChecker clientIndex domain ip))))
       cacheAbleCheck (new CacheAbleChecker chinaOnlyChecker (* 1000 (* 60 (* 60))))
       ipChecker (reify IPChecker
                   (isIPValid [_ clientIndex domain ip]
