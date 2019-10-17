@@ -22,6 +22,7 @@
                           (getExecutor [_] (Executors/newFixedThreadPool 4))))))
 
 (let [chinaOnlyChecker (new ChinaOnlyChecker)
+      ;certificateChecker (load-file "/certificateChecker.clj")
       cacheAbleCheck (new CacheAbleChecker chinaOnlyChecker (* 1000 (* 60 (* 60))))
       ipChecker (reify IPChecker
                   (isIPValid [_ clientIndex domain ip]
