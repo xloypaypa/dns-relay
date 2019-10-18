@@ -22,11 +22,16 @@
                           (getExecutor [_] (Executors/newFixedThreadPool 4))))))
 
 (let [chinaOnlyChecker (new ChinaOnlyChecker)
+      ;certificateChecker (load-file "/certificateChecker.clj")
+      ;chinaOnlyAndMustCanGetCertificateChecker (reify IPChecker
+      ;                                           (isIPValid [_ clientIndex domain ip]
+      ;                                             (and (.isIPValid chinaOnlyChecker clientIndex domain ip)
+      ;                                                  (.isIPValid certificateChecker clientIndex domain ip))))
       cacheAbleCheck (new CacheAbleChecker chinaOnlyChecker (* 1000 (* 60 (* 60))))
       ipChecker (reify IPChecker
-                  (isIPValid [_ clientIndex ip]
+                  (isIPValid [_ clientIndex domain ip]
                     (if (= clientIndex 0)
-                      (.isIPValid cacheAbleCheck clientIndex ip)
+                      (.isIPValid cacheAbleCheck clientIndex domain ip)
                       true)))]
   (def mergerConfig (reify MergerConfig
                       (getMerger [_] (new CheckAbleDnsMerger ipChecker)))))
