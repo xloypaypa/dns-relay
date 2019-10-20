@@ -53,9 +53,10 @@
 >   * default就是根据clients配置的顺序来的。以第一个有效的返回为返回。也就是说，如果第一个client返回的dns responds里说查询失败了，而第二个client返回了ip等结果。那么依然会以第一client那个失败的结果返回。当且仅当第一个client由于连不上、超时等情况导致没有返回时才会使用后续的dns。也就是说，默认的merger，认为排在前面的dns server更加可靠。
 >   * CheckAbleDnsMerger这个就更厉害啦。要求传入一个IPChecker。
 >       * IPChecker就只做isIPValid一件事。参数是clientIndex和IP地址。clientIndex就是前面upstream的clients的下标（毕竟是配置文件，令人难受就难受吧）。
->       * ~~ChinaOnlyChecker**是调淘宝的ip库**来判断ip是否是国内ip，如果404则认为是国外ip。example里就用的这个，并套了一个cache。~~
 >       * CacheAbleChecker要求传入一个做事的IPChecker和一个缓存清理时间。**手写的cache，就自求多福吧。**
 >       * example就是一个典型的只采纳114dns的国内ip，国外ip全部视为invalid的例子。因为只有在client下标为0的时候才去调ChinaOnlyChecker。
+>       * chinaIPChecker.clj是每天去拉[china_ip_list](https://github.com/17mon/china_ip_list)这个库。只有国内ip才会给true（通过）。
+>       * certifacteChecker.clj是根据你提供的域名和查询到的ip，去从443端口获取证书。只有在获取到的证书和域名匹配的情况下才会通过。（建议和ChinaIPChecker一起使用）
 
 > the [example](https://github.com/xloypaypa/dns-relay/tree/master/example) is very clear. Things could be easier if you read the code directly.
 
