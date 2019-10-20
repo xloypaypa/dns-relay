@@ -3,7 +3,9 @@ package online.xloypaypa.dns.relay;
 import online.xloypaypa.dns.relay.config.Config;
 import online.xloypaypa.dns.relay.network.client.MultiDnsClient;
 import online.xloypaypa.dns.relay.network.server.DnsServer;
+import org.eclipse.jgit.api.Git;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Main {

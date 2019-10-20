@@ -2,7 +2,7 @@
   (:import (online.xloypaypa.dns.relay.config ServerConfig ServerConfig$SSL UpstreamConfig$ClientConfig UpstreamConfig$ClientConfig$SSL UpstreamConfig MergerConfig Config)
            (java.util.concurrent Executors)
            (online.xloypaypa.dns.relay.network.merger CheckAbleDnsMerger)
-           (online.xloypaypa.dns.relay.network.merger.checker IPChecker ChinaOnlyChecker CacheAbleChecker)))
+           (online.xloypaypa.dns.relay.network.merger.checker IPChecker CacheAbleChecker)))
 
 (def serverConfig (reify ServerConfig
                     (getExecutor [_] (Executors/newFixedThreadPool 4))
@@ -21,13 +21,13 @@
                           (getClientConfigs [_] clients)
                           (getExecutor [_] (Executors/newFixedThreadPool 4))))))
 
-(let [chinaOnlyChecker (new ChinaOnlyChecker)
+(let [chinaIPcChecker (load-file "/chinaIPChecker.clj")
       ;certificateChecker (load-file "/certificateChecker.clj")
       ;chinaOnlyAndMustCanGetCertificateChecker (reify IPChecker
       ;                                           (isIPValid [_ clientIndex domain ip]
       ;                                             (and (.isIPValid chinaOnlyChecker clientIndex domain ip)
       ;                                                  (.isIPValid certificateChecker clientIndex domain ip))))
-      cacheAbleCheck (new CacheAbleChecker chinaOnlyChecker (* 1000 (* 60 (* 60))))
+      cacheAbleCheck (new CacheAbleChecker chinaIPcChecker (* 1000 (* 60 (* 60))))
       ipChecker (reify IPChecker
                   (isIPValid [_ clientIndex domain ip]
                     (if (= clientIndex 0)
