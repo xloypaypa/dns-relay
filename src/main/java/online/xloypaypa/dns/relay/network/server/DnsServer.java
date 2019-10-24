@@ -10,7 +10,6 @@ import online.xloypaypa.dns.relay.network.server.util.DnsServiceImpl;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 public class DnsServer {
@@ -38,6 +37,8 @@ public class DnsServer {
         nettyServerBuilder.addService(new DnsServiceImpl(this.multiDnsClient));
         if (this.serverConfig.getSsl().isEnable()) {
             nettyServerBuilder.sslContext(getSslContextBuilder().build());
+        } else {
+            nettyServerBuilder.sslContext(null);
         }
         server = nettyServerBuilder.build().start();
         logger.info("Server started, listening on " + this.serverConfig.getPort());
