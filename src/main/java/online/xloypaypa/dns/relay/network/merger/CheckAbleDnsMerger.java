@@ -78,16 +78,22 @@ public class CheckAbleDnsMerger extends DefaultMerger {
                 continue;
             }
 
-            List<Answer> answersRelated = getAnswersForQuestion(domain, respond);
-            boolean isBlock = !checkIfAnswerValid(index, domain, answersRelated.stream().filter(now -> now.dnsResourceRecord.getRType() == 1).collect(Collectors.toList()));
-            for (Answer answer : answersRelated) {
-                answer.checked = true;
-            }
-            if (!isBlock) {
-                logger.info("for " + domain + ", accepted #" + respond.index + "'s respond");
-                return answersRelated;
-            } else {
-                logger.info("for " + domain + ", blocked #" + respond.index + "'s respond");
+            try {
+                List<Answer> answersRelated = getAnswersForQuestion(domain, respond);
+                boolean isBlock = !checkIfAnswerValid(index, domain, answersRelated.stream().filter(now -> now.dnsResourceRecord.getRType() == 1).collect(Collectors.toList()));
+                for (Answer answer : answersRelated) {
+                    answer.checked = true;
+                }
+                if (!isBlock) {
+                    logger.info("for " + domain + ", accepted #" + respond.index + "'s respond");
+                    return answersRelated;
+                } else {
+                    logger.info("for " + domain + ", blocked #" + respond.index + "'s respond");
+                }
+            } catch (StackOverflowError e) {
+                logger.severe("Get stack overflow error for: " + domain);
+                e.printStackTrace();
+                throw e;
             }
         }
         throw new RuntimeException("all responds blocked");
