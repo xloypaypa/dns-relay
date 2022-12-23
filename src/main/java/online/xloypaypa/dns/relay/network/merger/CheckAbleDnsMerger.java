@@ -144,12 +144,15 @@ public class CheckAbleDnsMerger extends DefaultMerger {
     private List<Answer> getAnswersForQuestion(String domain, CheckableDNsMessage respond) throws DNSParseException {
         List<Answer> result = new ArrayList<>();
         for (Answer now : respond.answers) {
-            if (!domain.equals(now.dnsResourceRecord.getName())) continue;
+            if (!domain.equals(now.dnsResourceRecord.getName()) || now.answered) continue;
 
             if (now.dnsResourceRecord.getRType() == 1) {
                 result.add(now);
+                now.answered = true;
             } else if (now.dnsResourceRecord.getRType() == 5) {
                 result.add(now);
+                now.answered = true;
+
                 result.addAll(getAnswersForQuestion(NameParser.parseName(ByteBuffer.wrap(now.dnsResourceRecord.getRData())), respond));
             }
         }
@@ -184,10 +187,12 @@ public class CheckAbleDnsMerger extends DefaultMerger {
     private static class Answer {
         private DNSResourceRecord dnsResourceRecord;
         private boolean checked;
+        private boolean answered;
 
         private Answer(DNSResourceRecord dnsResourceRecord) {
             this.dnsResourceRecord = dnsResourceRecord;
             this.checked = false;
+            this.answered = false;
         }
     }
 }
