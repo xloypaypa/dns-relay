@@ -1,4 +1,4 @@
-FROM gradle:jdk11 AS builder
+FROM gradle:6-jdk11 AS builder
 
 ADD ./ /code
 RUN cd /code && gradle clean build --info
